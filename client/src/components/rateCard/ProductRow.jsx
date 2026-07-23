@@ -1,6 +1,6 @@
 import { Pencil, Trash2 } from "lucide-react";
 
-function ProductRow({ product }) {
+function ProductRow({ product, deleteProduct, }) {
   return (
     <tr className="border-t hover:bg-gray-50">
       <td className="p-3">{product.name}</td>
@@ -17,7 +17,10 @@ function ProductRow({ product }) {
             <Pencil size={18} />
           </button>
 
-          <button>
+          <button
+            onClick={() => deleteProduct(product.id)}
+            className="text-red-500 hover:text-red-700"
+          >
             <Trash2 size={18} />
           </button>
         </div>

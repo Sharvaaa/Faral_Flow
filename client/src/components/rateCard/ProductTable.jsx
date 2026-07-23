@@ -1,6 +1,6 @@
 import ProductRow from "./ProductRow";
 
-function ProductTable({ products }) {
+function ProductTable({ products , deleteProduct,}) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <table className="w-full">
@@ -19,6 +19,7 @@ function ProductTable({ products }) {
             <ProductRow
               key={product.id}
               product={product}
+              deleteProduct={deleteProduct}
             />
           ))}
         </tbody>
