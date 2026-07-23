@@ -1,23 +1,4 @@
-const orders = [
-  {
-    customer: "Rahul",
-    items: 3,
-    status: "Pending",
-    amount: "₹750",
-  },
-  {
-    customer: "Priya",
-    items: 5,
-    status: "Packed",
-    amount: "₹1400",
-  },
-  {
-    customer: "Amit",
-    items: 2,
-    status: "Collected",
-    amount: "₹450",
-  },
-];
+import { recentOrders } from "../../data/orders";
 
 function RecentOrders() {
   return (
@@ -25,7 +6,6 @@ function RecentOrders() {
       <h2>Recent Orders</h2>
 
       <table>
-
         <thead>
           <tr>
             <th>Customer</th>
@@ -36,22 +16,19 @@ function RecentOrders() {
         </thead>
 
         <tbody>
-
-          {orders.map((order, index) => (
+          {recentOrders.map((order, index) => (
             <tr key={index}>
               <td>{order.customer}</td>
               <td>{order.items}</td>
               <td>
                 <span className={`status ${order.status.toLowerCase()}`}>
-                    {order.status}
+                  {order.status}
                 </span>
-             </td>
+              </td>
               <td>{order.amount}</td>
             </tr>
           ))}
-
         </tbody>
-
       </table>
     </div>
   );

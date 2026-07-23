@@ -1,11 +1,5 @@
-import Layout from "../components/layout/Layout";
-
 function Inventory() {
-  return (
-    <Layout>
-      <h1>Inventory</h1>
-    </Layout>
-  );
+  return <h1>Inventory</h1>;
 }
 
 export default Inventory;

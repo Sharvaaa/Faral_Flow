@@ -1,4 +1,3 @@
-import Layout from "../components/layout/Layout";
 import StatCard from "../components/dashboard/StatCard";
 import RecentOrders from "../components/dashboard/RecentOrders";
 
@@ -6,17 +5,16 @@ import {
   FaClipboardList,
   FaClock,
   FaCheckCircle,
-  FaIndianRupeeSign,
-} from "react-icons/fa6";
+} from "react-icons/fa";
+
+import { FaIndianRupeeSign } from "react-icons/fa6";
 
 function Dashboard() {
   return (
-    <Layout>
-
+    <>
       <h1 className="dashboard-title">Dashboard</h1>
 
       <div className="stats-grid">
-
         <StatCard
           title="Total Orders"
           value="24"
@@ -40,12 +38,10 @@ function Dashboard() {
           value="₹28,500"
           icon={<FaIndianRupeeSign size={30} />}
         />
-
       </div>
 
       <RecentOrders />
-
-    </Layout>
+    </>
   );
 }
 
