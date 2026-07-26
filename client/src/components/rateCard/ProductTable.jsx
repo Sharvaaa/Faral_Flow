@@ -1,6 +1,7 @@
 import ProductRow from "./ProductRow";
 
-function ProductTable({ products , deleteProduct,}) {
+function ProductTable({ products , deleteProduct, editProduct}) {
+  console.log(editProduct);
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <table className="w-full">
@@ -20,6 +21,7 @@ function ProductTable({ products , deleteProduct,}) {
               key={product.id}
               product={product}
               deleteProduct={deleteProduct}
+              editProduct={editProduct}
             />
           ))}
         </tbody>

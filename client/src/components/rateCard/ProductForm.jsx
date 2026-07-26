@@ -1,4 +1,11 @@
-function ProductForm({ formData, setFormData, addProduct}) {
+function ProductForm({
+  formData,
+  setFormData,
+  addProduct,
+  updateProduct,
+  editingProduct,
+  cancelEdit,
+}) {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -11,11 +18,10 @@ function ProductForm({ formData, setFormData, addProduct}) {
   return (
     <div className="bg-white rounded-lg shadow-md p-5 mb-8">
       <h2 className="text-xl font-semibold mb-4">
-        Add Product
+        {editingProduct ? "Edit Product" : "Add Product"}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
         <input
           type="text"
           name="name"
@@ -31,12 +37,12 @@ function ProductForm({ formData, setFormData, addProduct}) {
           onChange={handleChange}
           className="border rounded-lg p-2"
         >
-          <option>kg</option>
-          <option>gram</option>
-          <option>piece</option>
-          <option>packet</option>
-          <option>box</option>
-          <option>dozen</option>
+          <option value="kg">kg</option>
+          <option value="gram">gram</option>
+          <option value="piece">piece</option>
+          <option value="packet">packet</option>
+          <option value="box">box</option>
+          <option value="dozen">dozen</option>
         </select>
 
         <input
@@ -56,14 +62,25 @@ function ProductForm({ formData, setFormData, addProduct}) {
           placeholder="Wholesale Price (₹)"
           className="border rounded-lg p-2"
         />
-
       </div>
 
-      <button
-        onClick={addProduct}
-        className="mt-5 bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800">
-        Add Product
-      </button>
+      <div className="mt-5 flex gap-3">
+        <button
+          onClick={editingProduct ? updateProduct : addProduct}
+          className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800"
+        >
+          {editingProduct ? "Update Product" : "Add Product"}
+        </button>
+
+        {editingProduct && (
+          <button
+            onClick={cancelEdit}
+            className="border px-5 py-2 rounded-lg hover:bg-gray-100"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </div>
   );
 }

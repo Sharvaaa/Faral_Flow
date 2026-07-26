@@ -1,6 +1,6 @@
 import { Pencil, Trash2 } from "lucide-react";
 
-function ProductRow({ product, deleteProduct, }) {
+function ProductRow({ product, deleteProduct, editProduct }) {
   return (
     <tr className="border-t hover:bg-gray-50">
       <td className="p-3">{product.name}</td>
@@ -13,7 +13,10 @@ function ProductRow({ product, deleteProduct, }) {
 
       <td className="p-3">
         <div className="flex justify-center gap-3">
-          <button>
+          <button
+            onClick={() => editProduct(product)}
+            className="text-blue-600 hover:text-blue-800"
+          >
             <Pencil size={18} />
           </button>
 

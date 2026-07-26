@@ -3,18 +3,20 @@ import ProductForm from "../components/rateCard/ProductForm";
 import ProductTable from "../components/rateCard/ProductTable";
 import sampleProducts from "../data/sampleProducts";
 
+const initialFormData = {
+  name: "",
+  unit: "kg",
+  retailPrice: "",
+  wholesalePrice: "",
+};
+
 function RateCard() {
-  const [products, setProducts] =useState(sampleProducts);
+  const [products, setProducts] = useState(sampleProducts);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [formData, setFormData] = useState(initialFormData);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    unit: "kg",
-    retailPrice: "",
-    wholesalePrice: "",
-  });
-
+  // Add Product
   const addProduct = () => {
-    // Validation
     if (
       !formData.name.trim() ||
       !formData.retailPrice ||
@@ -34,19 +36,64 @@ function RateCard() {
 
     setProducts((prevProducts) => [...prevProducts, newProduct]);
 
-    // Reset form
+    setFormData(initialFormData);
+  };
+
+  // Delete Product
+  const deleteProduct = (id) => {
+    setProducts((prevProducts) =>
+      prevProducts.filter((product) => product.id !== id)
+    );
+  };
+
+  // Edit Product
+  const editProduct = (product) => {
+    console.log("Edit clicked");
+    console.log(product);
+
+    setEditingProduct(product);
+
     setFormData({
-      name: "",
-      unit: "kg",
-      retailPrice: "",
-      wholesalePrice: "",
+      name: product.name,
+      unit: product.unit,
+      retailPrice: product.retailPrice,
+      wholesalePrice: product.wholesalePrice,
     });
   };
 
-  const deleteProduct = (id) => {
-      setProducts((prevProducts) =>
-        prevProducts.filter((product) => product.id !== id)
-      );
+  // Update Product
+  const updateProduct = () => {
+    if (
+      !formData.name.trim() ||
+      !formData.retailPrice ||
+      !formData.wholesalePrice
+    ) {
+      alert("Please fill all the fields.");
+      return;
+    }
+
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === editingProduct.id
+          ? {
+              ...product,
+              name: formData.name,
+              unit: formData.unit,
+              retailPrice: Number(formData.retailPrice),
+              wholesalePrice: Number(formData.wholesalePrice),
+            }
+          : product
+      )
+    );
+
+    setEditingProduct(null);
+    setFormData(initialFormData);
+  };
+
+  // Cancel Editing
+  const cancelEdit = () => {
+    setEditingProduct(null);
+    setFormData(initialFormData);
   };
 
   return (
@@ -57,11 +104,15 @@ function RateCard() {
         formData={formData}
         setFormData={setFormData}
         addProduct={addProduct}
+        updateProduct={updateProduct}
+        editingProduct={editingProduct}
+        cancelEdit={cancelEdit}
       />
 
       <ProductTable
         products={products}
         deleteProduct={deleteProduct}
+        editProduct={editProduct}
       />
     </div>
   );
