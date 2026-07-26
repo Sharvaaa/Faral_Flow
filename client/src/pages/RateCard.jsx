@@ -17,18 +17,35 @@ function RateCard() {
 
   // Add Product
   const addProduct = () => {
-    if (
-      !formData.name.trim() ||
-      !formData.retailPrice ||
-      !formData.wholesalePrice
-    ) {
-      alert("Please fill all the fields.");
+    const duplicate = products.some(
+      (product) =>
+        product.name.toLowerCase() === formData.name.toLowerCase() &&
+        product.id !== editingProduct?.id
+    );
+
+    if (duplicate) {
+      alert("Product already exists.");
+      return;
+    }
+    
+    if (!formData.name.trim()) {
+      alert("Please enter a product name.");
+      return;
+    }
+
+    if (!formData.retailPrice || Number(formData.retailPrice) <= 0) {
+      alert("Retail price must be greater than 0.");
+      return;
+    }
+
+    if (!formData.wholesalePrice || Number(formData.wholesalePrice) <= 0) {
+      alert("Wholesale price must be greater than 0.");
       return;
     }
 
     const newProduct = {
       id: crypto.randomUUID(),
-      name: formData.name,
+      name: formData.name.trim(),
       unit: formData.unit,
       retailPrice: Number(formData.retailPrice),
       wholesalePrice: Number(formData.wholesalePrice),
@@ -40,7 +57,14 @@ function RateCard() {
   };
 
   // Delete Product
+  // Delete Product
   const deleteProduct = (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+
+    if (!confirmDelete) return;
+
     setProducts((prevProducts) =>
       prevProducts.filter((product) => product.id !== id)
     );
@@ -63,12 +87,18 @@ function RateCard() {
 
   // Update Product
   const updateProduct = () => {
-    if (
-      !formData.name.trim() ||
-      !formData.retailPrice ||
-      !formData.wholesalePrice
-    ) {
-      alert("Please fill all the fields.");
+    if (!formData.name.trim()) {
+      alert("Please enter a product name.");
+      return;
+    }
+
+    if (!formData.retailPrice || Number(formData.retailPrice) <= 0) {
+      alert("Retail price must be greater than 0.");
+      return;
+    }
+
+    if (!formData.wholesalePrice || Number(formData.wholesalePrice) <= 0) {
+      alert("Wholesale price must be greater than 0.");
       return;
     }
 

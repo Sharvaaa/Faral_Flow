@@ -16,14 +16,22 @@ function ProductTable({ products , deleteProduct, editProduct}) {
         </thead>
 
         <tbody>
-          {products.map((product) => (
-            <ProductRow
-              key={product.id}
-              product={product}
-              deleteProduct={deleteProduct}
-              editProduct={editProduct}
-            />
-          ))}
+          {products.length === 0 ? (
+            <tr>
+              <td colSpan="5" className="p-6 text-center text-gray-500">
+                No products added yet.
+              </td>
+            </tr>
+          ) : (
+            products.map((product) => (
+              <ProductRow
+                key={product.id}
+                product={product}
+                deleteProduct={deleteProduct}
+                editProduct={editProduct}
+              />
+            ))
+          )}
         </tbody>
       </table>
     </div>
