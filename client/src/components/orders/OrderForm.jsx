@@ -4,7 +4,6 @@ function OrderForm({ formData, setFormData, products }) {
   const [selectedProductId, setSelectedProductId] = useState("");
   const [packetCount, setPacketCount] = useState("");
   const [packetSize, setPacketSize] = useState("");
-  const [packetUnit, setPacketUnit] = useState("g");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,10 +19,9 @@ function OrderForm({ formData, setFormData, products }) {
       !selectedProductId ||
       !packetCount ||
       !packetSize ||
-      Number(packetCount) <= 0 ||
-      Number(packetSize) <= 0
+      Number(packetCount) <= 0
     ) {
-      alert("Please enter product, packet count and packet size.");
+      alert("Please select a product, packet count and packet size.");
       return;
     }
 
@@ -38,19 +36,14 @@ function OrderForm({ formData, setFormData, products }) {
     }
 
     const count = Number(packetCount);
-    const size = Number(packetSize);
+    const sizeInGrams = Number(packetSize);
 
-    // Convert packet size into kg
-    let quantityInKg;
-
-    if (packetUnit === "g") {
-      quantityInKg = (count * size) / 1000;
-    } else {
-      quantityInKg = count * size;
-    }
+    // Convert total packet quantity into kilograms
+    const quantityInKg = (count * sizeInGrams) / 1000;
 
     const price = Number(selectedProduct.retailPrice);
 
+    // Calculate total price
     const itemTotal = quantityInKg * price;
 
     const newItem = {
@@ -58,8 +51,7 @@ function OrderForm({ formData, setFormData, products }) {
       productName: selectedProduct.name,
 
       packetCount: count,
-      packetSize: size,
-      packetUnit: packetUnit,
+      packetSize: sizeInGrams,
 
       quantityInKg: quantityInKg,
 
@@ -78,7 +70,6 @@ function OrderForm({ formData, setFormData, products }) {
     setSelectedProductId("");
     setPacketCount("");
     setPacketSize("");
-    setPacketUnit("g");
   };
 
   const handleRemoveItem = (indexToRemove) => {
@@ -94,6 +85,14 @@ function OrderForm({ formData, setFormData, products }) {
     (total, item) => total + item.total,
     0
   );
+
+  const formatPacketSize = (size) => {
+    if (size >= 1000) {
+      return `${size / 1000} kg`;
+    }
+
+    return `${size} g`;
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -190,7 +189,7 @@ function OrderForm({ formData, setFormData, products }) {
           Add Products
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Product */}
           <div>
             <label className="block mb-2 font-medium">
@@ -245,32 +244,30 @@ function OrderForm({ formData, setFormData, products }) {
 
             <select
               value={packetSize}
-              onChange={(e) => setPacketSize(e.target.value)}
-              className="w-full border rounded-lg px-4 py-2"
-            >
-              <option value="">Select Size</option>
-              <option value="250">250 g</option>
-              <option value="500">500 g</option>
-              <option value="750">750 g</option>
-              <option value="1">1000 g</option>
-            </select>
-          </div>
-
-          {/* Unit */}
-          <div>
-            <label className="block mb-2 font-medium">
-              Unit
-            </label>
-
-            <select
-              value={packetUnit}
               onChange={(e) =>
-                setPacketUnit(e.target.value)
+                setPacketSize(e.target.value)
               }
               className="w-full border rounded-lg px-4 py-2"
             >
-              <option value="g">Grams</option>
-              <option value="kg">Kilograms</option>
+              <option value="">
+                Select Size
+              </option>
+
+              <option value="250">
+                250 g
+              </option>
+
+              <option value="500">
+                500 g
+              </option>
+
+              <option value="750">
+                750 g
+              </option>
+
+              <option value="1000">
+                1 kg
+              </option>
             </select>
           </div>
         </div>
@@ -320,7 +317,7 @@ function OrderForm({ formData, setFormData, products }) {
                     </td>
 
                     <td className="py-3">
-                      {item.packetSize} {item.packetUnit}
+                      {formatPacketSize(item.packetSize)}
                     </td>
 
                     <td className="py-3">
@@ -348,6 +345,7 @@ function OrderForm({ formData, setFormData, products }) {
             </table>
           </div>
 
+          {/* Grand Total */}
           <div className="flex justify-end mt-6">
             <div className="text-xl font-semibold">
               Grand Total: ₹{grandTotal.toFixed(2)}
