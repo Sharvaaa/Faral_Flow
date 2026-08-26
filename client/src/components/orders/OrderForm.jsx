@@ -1,6 +1,12 @@
 import { useState } from "react";
+import OrderItemsTable from "./OrderItemsTable";
 
-function OrderForm({ formData, setFormData, products }) {
+function OrderForm({
+  formData,
+  setFormData,
+  products,
+  onSaveOrder,
+}) {
   const [selectedProductId, setSelectedProductId] = useState("");
   const [packetCount, setPacketCount] = useState("");
   const [packetSize, setPacketSize] = useState("");
@@ -41,6 +47,7 @@ function OrderForm({ formData, setFormData, products }) {
     // Convert total packet quantity into kilograms
     const quantityInKg = (count * sizeInGrams) / 1000;
 
+    // Get price from Rate Card
     const price = Number(selectedProduct.retailPrice);
 
     // Calculate total price
@@ -79,19 +86,6 @@ function OrderForm({ formData, setFormData, products }) {
         (_, index) => index !== indexToRemove
       ),
     }));
-  };
-
-  const grandTotal = formData.items.reduce(
-    (total, item) => total + item.total,
-    0
-  );
-
-  const formatPacketSize = (size) => {
-    if (size >= 1000) {
-      return `${size / 1000} kg`;
-    }
-
-    return `${size} g`;
   };
 
   return (
@@ -176,9 +170,9 @@ function OrderForm({ formData, setFormData, products }) {
             onChange={handleChange}
             className="w-full border rounded-lg px-4 py-2"
           >
-            <option>Pending</option>
-            <option>Packed</option>
-            <option>Collected</option>
+            <option value="Pending">Pending</option>
+            <option value="Packed">Packed</option>
+            <option value="Collected">Collected</option>
           </select>
         </div>
       </div>
@@ -276,81 +270,28 @@ function OrderForm({ formData, setFormData, products }) {
         <button
           type="button"
           onClick={handleAddItem}
-          className="mt-5 bg-black text-white rounded-lg px-6 py-2"
+          className="mt-5 bg-black text-white rounded-lg px-6 py-2 hover:bg-gray-800"
         >
           Add Item
         </button>
       </div>
 
       {/* Order Items */}
+      <OrderItemsTable
+        items={formData.items}
+        onRemove={handleRemoveItem}
+      />
+
+      {/* Save Order */}
       {formData.items.length > 0 && (
-        <div className="border-t mt-8 pt-6">
-          <h3 className="text-lg font-semibold mb-4">
-            Order Items
-          </h3>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b text-left">
-                  <th className="py-3">Product</th>
-                  <th className="py-3">Packets</th>
-                  <th className="py-3">Packet Size</th>
-                  <th className="py-3">Price</th>
-                  <th className="py-3">Total</th>
-                  <th className="py-3">Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {formData.items.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="border-b"
-                  >
-                    <td className="py-3">
-                      {item.productName}
-                    </td>
-
-                    <td className="py-3">
-                      {item.packetCount}
-                    </td>
-
-                    <td className="py-3">
-                      {formatPacketSize(item.packetSize)}
-                    </td>
-
-                    <td className="py-3">
-                      ₹{item.price}/kg
-                    </td>
-
-                    <td className="py-3">
-                      ₹{item.total.toFixed(2)}
-                    </td>
-
-                    <td className="py-3">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleRemoveItem(index)
-                        }
-                        className="text-red-500"
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Grand Total */}
-          <div className="flex justify-end mt-6">
-            <div className="text-xl font-semibold">
-              Grand Total: ₹{grandTotal.toFixed(2)}
-            </div>
-          </div>
+        <div className="flex justify-end mt-6">
+          <button
+            type="button"
+            onClick={onSaveOrder}
+            className="bg-green-600 text-white rounded-lg px-6 py-3 hover:bg-green-700"
+          >
+            Save Order
+          </button>
         </div>
       )}
     </div>
