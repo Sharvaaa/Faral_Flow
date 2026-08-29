@@ -1,19 +1,34 @@
-function OrdersList({ orders }) {
+import OrderRow from "./OrderRow";
+
+function OrdersList({
+  orders,
+  onEdit,
+  onDelete,
+  onStatusChange,
+}) {
+  if (!orders || orders.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 text-center text-gray-500">
+        No orders found.
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-semibold mb-6">
+    <div>
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">
         Orders
       </h2>
 
-      {orders.length === 0 ? (
-        <p className="text-gray-500">
-          No orders yet.
-        </p>
-      ) : (
-        <p className="text-gray-600">
-          {orders.length} order(s) found.
-        </p>
-      )}
+      {orders.map((order, index) => (
+        <OrderRow
+          key={order?.id || index}
+          order={order}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onStatusChange={onStatusChange}
+        />
+      ))}
     </div>
   );
 }

@@ -18,6 +18,19 @@ function Orders() {
     items: [],
   });
 
+  const resetForm = () => {
+    setFormData({
+      customerName: "",
+      phone: "",
+      orderDate: "",
+      pickupDate: "",
+      status: "Pending",
+      items: [],
+    });
+
+    setEditingOrder(null);
+  };
+
   const handleSaveOrder = () => {
     if (!formData.customerName.trim()) {
       alert("Please enter customer name.");
@@ -39,35 +52,77 @@ function Orders() {
       0
     );
 
-    const newOrder = {
-      id: crypto.randomUUID(),
+    if (editingOrder) {
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === editingOrder.id
+            ? {
+                ...order,
+                customerName: formData.customerName,
+                phone: formData.phone,
+                orderDate: formData.orderDate,
+                pickupDate: formData.pickupDate,
+                status: formData.status,
+                items: formData.items,
+                grandTotal: grandTotal,
+              }
+            : order
+        )
+      );
 
-      customerName: formData.customerName,
-      phone: formData.phone,
-      orderDate: formData.orderDate,
-      pickupDate: formData.pickupDate,
-      status: formData.status,
+      alert("Order updated successfully!");
+    } else {
+      const newOrder = {
+        id: crypto.randomUUID(),
+        customerName: formData.customerName,
+        phone: formData.phone,
+        orderDate: formData.orderDate,
+        pickupDate: formData.pickupDate,
+        status: formData.status,
+        items: formData.items,
+        grandTotal: grandTotal,
+      };
 
-      items: formData.items,
+      setOrders((prevOrders) => [...prevOrders, newOrder]);
 
-      grandTotal: grandTotal,
-    };
+      alert("Order saved successfully!");
+    }
 
-    setOrders((prevOrders) => [
-      ...prevOrders,
-      newOrder,
-    ]);
+    resetForm();
+  };
+
+  const handleEditOrder = (order) => {
+    setEditingOrder(order);
 
     setFormData({
-      customerName: "",
-      phone: "",
-      orderDate: "",
-      pickupDate: "",
-      status: "Pending",
-      items: [],
+      customerName: order.customerName,
+      phone: order.phone,
+      orderDate: order.orderDate,
+      pickupDate: order.pickupDate,
+      status: order.status,
+      items: order.items,
     });
 
-    alert("Order saved successfully!");
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const handleDeleteOrder = (orderId) => {
+    setOrders((prevOrders) =>
+      prevOrders.filter((order) => order.id !== orderId)
+    );
+  };
+
+  const handleStatusChange = (orderId, newStatus) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId
+          ? { ...order, status: newStatus }
+          : order
+      )
+    );
   };
 
   return (
@@ -77,9 +132,15 @@ function Orders() {
         setFormData={setFormData}
         products={sampleProducts}
         onSaveOrder={handleSaveOrder}
+        editingOrder={editingOrder}
       />
 
-      <OrdersList orders={orders} />
+      <OrdersList
+        orders={orders}
+        onEdit={handleEditOrder}
+        onDelete={handleDeleteOrder}
+        onStatusChange={handleStatusChange}
+      />
     </div>
   );
 }
