@@ -21,7 +21,13 @@ function OrderRow({ order, onEdit, onDelete, onStatusChange }) {
           onChange={(e) =>
             onStatusChange(order.id, e.target.value)
           }
-          className="px-3 py-1 rounded-full text-sm font-medium border"
+          className={`px-3 py-1 rounded-full text-sm font-medium border ${
+            order.status === "Pending"
+              ? "bg-yellow-100 text-yellow-700 border-yellow-300"
+              : order.status === "Packed"
+              ? "bg-blue-100 text-blue-700 border-blue-300"
+              : "bg-green-100 text-green-700 border-green-300"
+          }`}
         >
           <option value="Pending">Pending</option>
           <option value="Packed">Packed</option>

@@ -116,6 +116,12 @@ function Orders() {
   };
 
   const handleStatusChange = (orderId, newStatus) => {
+    const validStatuses = ["Pending", "Packed", "Collected"];
+
+    if (!validStatuses.includes(newStatus)) {
+      return;
+    }
+
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
         order.id === orderId
