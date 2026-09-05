@@ -5,13 +5,14 @@ function OrderRow({ order, onEdit, onDelete, onStatusChange }) {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-5 mb-4">
-      <div className="flex justify-between items-start">
+      {/* Header */}
+      <div className="flex justify-between items-start gap-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-800">
             {order.customerName}
           </h3>
 
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 break-all">
             Order ID: {order.id}
           </p>
         </div>
@@ -21,7 +22,7 @@ function OrderRow({ order, onEdit, onDelete, onStatusChange }) {
           onChange={(e) =>
             onStatusChange(order.id, e.target.value)
           }
-          className={`px-3 py-1 rounded-full text-sm font-medium border ${
+          className={`px-3 py-2 rounded-lg text-sm font-medium border ${
             order.status === "Pending"
               ? "bg-yellow-100 text-yellow-700 border-yellow-300"
               : order.status === "Packed"
@@ -35,26 +36,47 @@ function OrderRow({ order, onEdit, onDelete, onStatusChange }) {
         </select>
       </div>
 
-      <div className="mt-4">
-        <h4 className="font-medium text-gray-700 mb-2">
+      {/* Items */}
+      <div className="mt-5">
+        <h4 className="font-semibold text-gray-700 mb-3">
           Items
         </h4>
 
-        {order.items?.map((item, index) => (
-          <div
-            key={item.id || index}
-            className="flex justify-between text-sm border-b py-2"
-          >
-            <span>
-              {item.productName} × {item.packetCount}
-            </span>
+        <div className="space-y-3">
+          {order.items?.map((item, index) => (
+            <div
+              key={item.productId || index}
+              className="border rounded-lg p-3"
+            >
+              <div className="flex justify-between items-center">
+                <p className="font-semibold text-gray-800">
+                  {item.productName}
+                </p>
 
-            <span>₹{item.total}</span>
-          </div>
-        ))}
+                <p className="font-semibold text-gray-800">
+                  ₹{item.total}
+                </p>
+              </div>
+
+              <div className="mt-1 text-sm text-gray-500">
+                <p>
+                  Quantity:{" "}
+                  <span className="font-medium text-gray-700">
+                    {item.quantity} {item.unit}
+                  </span>
+                </p>
+
+                <p>
+                  Rate: ₹{item.price} per {item.unit}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="flex justify-between items-center mt-4">
+      {/* Footer */}
+      <div className="flex justify-between items-center mt-5 pt-4 border-t">
         <p className="font-semibold text-gray-800">
           Total: ₹{order.grandTotal}
         </p>

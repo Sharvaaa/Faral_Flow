@@ -1,15 +1,14 @@
-import { useState } from "react";
 import InventoryTable from "../components/inventory/InventoryTable";
-import inventoryItems from "../data/inventoryItems";
 
-function Inventory() {
-  const [inventory, setInventory] = useState(inventoryItems);
-
+function Inventory({ inventory, setInventory }) {
   const increaseStock = (id) => {
     setInventory((prev) =>
       prev.map((item) =>
         item.id === id
-          ? { ...item, stock: item.stock + 1 }
+          ? {
+              ...item,
+              stock: item.stock + 1,
+            }
           : item
       )
     );
