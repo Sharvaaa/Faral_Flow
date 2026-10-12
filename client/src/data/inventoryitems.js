@@ -18,6 +18,12 @@ const inventoryItems = [
     stock: 0,
   },
   {
+  id: crypto.randomUUID(),
+  name: "Ladoo",
+  unit: "kg",
+  stock: 8,
+},
+  {
     id: crypto.randomUUID(),
     name: "Karanji",
     unit: "kg",

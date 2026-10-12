@@ -1,134 +1,225 @@
-import { useState } from "react";
+
+import { useCallback, useEffect, useState } from "react";
 import ProductForm from "../components/rateCard/ProductForm";
 import ProductTable from "../components/rateCard/ProductTable";
-import sampleProducts from "../data/sampleProducts";
+import { supabase } from "../services/supabase";
 
 const initialFormData = {
   name: "",
-  unit: "kg",
-  retailPrice: "",
+  retailPrice250g: "",
+  retailPrice500g: "",
+  retailPrice750g: "",
+  retailPrice1kg: "",
   wholesalePrice: "",
 };
 
+const toFormData = (product) => ({
+  name: product.name ?? "",
+  retailPrice250g: String(product.retail_price_250g ?? ""),
+  retailPrice500g: String(product.retail_price_500g ?? ""),
+  retailPrice750g: String(product.retail_price_750g ?? ""),
+  retailPrice1kg: String(product.retail_price_1kg ?? ""),
+  wholesalePrice: String(product.wholesale_price_per_kg ?? ""),
+});
+
+const toProduct = (product) => ({
+  ...product,
+  retailPrice250g: Number(product.retail_price_250g),
+  retailPrice500g: Number(product.retail_price_500g),
+  retailPrice750g: Number(product.retail_price_750g),
+  retailPrice1kg: Number(product.retail_price_1kg),
+  wholesalePrice: Number(product.wholesale_price_per_kg),
+});
+
 function RateCard() {
-  const [products, setProducts] = useState(sampleProducts);
+  const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  // Add Product
-  const addProduct = () => {
+  const loadProducts = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    const { data, error: fetchError } = await supabase
+      .from("products")
+      .select(
+        "id, name, retail_price_250g, retail_price_500g, retail_price_750g, retail_price_1kg, wholesale_price_per_kg, is_active"
+      )
+      .eq("is_active", true)
+      .order("name");
+
+    if (fetchError) {
+      setError(fetchError.message);
+      setProducts([]);
+    } else {
+      setProducts((data ?? []).map(toProduct));
+    }
+
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setError("Please enter a product name.");
+      return false;
+    }
+
+    const prices = [
+      ["250g retail price", formData.retailPrice250g],
+      ["500g retail price", formData.retailPrice500g],
+      ["750g retail price", formData.retailPrice750g],
+      ["1kg retail price", formData.retailPrice1kg],
+      ["Wholesale price per kg", formData.wholesalePrice],
+    ];
+
+    for (const [label, value] of prices) {
+      if (
+        value === "" ||
+        !Number.isFinite(Number(value)) ||
+        Number(value) <= 0
+      ) {
+        setError(`${label} must be greater than 0.`);
+        return false;
+      }
+    }
+
     const duplicate = products.some(
       (product) =>
-        product.name.toLowerCase() === formData.name.toLowerCase() &&
+        product.name.trim().toLowerCase() ===
+          formData.name.trim().toLowerCase() &&
         product.id !== editingProduct?.id
     );
 
     if (duplicate) {
-      alert("Product already exists.");
-      return;
-    }
-    
-    if (!formData.name.trim()) {
-      alert("Please enter a product name.");
-      return;
+      setError("A product with this name already exists.");
+      return false;
     }
 
-    if (!formData.retailPrice || Number(formData.retailPrice) <= 0) {
-      alert("Retail price must be greater than 0.");
+    return true;
+  };
+
+  const getDatabaseValues = () => ({
+    name: formData.name.trim(),
+    retail_price_250g: Number(formData.retailPrice250g),
+    retail_price_500g: Number(formData.retailPrice500g),
+    retail_price_750g: Number(formData.retailPrice750g),
+    retail_price_1kg: Number(formData.retailPrice1kg),
+    wholesale_price_per_kg: Number(formData.wholesalePrice),
+  });
+
+  const addProduct = async () => {
+    setError("");
+    if (!validateForm()) return;
+
+    setSaving(true);
+
+    const { error: insertError } = await supabase
+      .from("products")
+      .insert(getDatabaseValues());
+
+    setSaving(false);
+
+    if (insertError) {
+      setError(insertError.message);
       return;
     }
-
-    if (!formData.wholesalePrice || Number(formData.wholesalePrice) <= 0) {
-      alert("Wholesale price must be greater than 0.");
-      return;
-    }
-
-    const newProduct = {
-      id: crypto.randomUUID(),
-      name: formData.name.trim(),
-      unit: formData.unit,
-      retailPrice: Number(formData.retailPrice),
-      wholesalePrice: Number(formData.wholesalePrice),
-    };
-
-    setProducts((prevProducts) => [...prevProducts, newProduct]);
 
     setFormData(initialFormData);
+    await loadProducts();
   };
 
-  // Delete Product
-  // Delete Product
-  const deleteProduct = (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
-
-    if (!confirmDelete) return;
-
-    setProducts((prevProducts) =>
-      prevProducts.filter((product) => product.id !== id)
-    );
-  };
-
-  // Edit Product
   const editProduct = (product) => {
-    console.log("Edit clicked");
-    console.log(product);
-
+    setError("");
     setEditingProduct(product);
-
-    setFormData({
-      name: product.name,
-      unit: product.unit,
-      retailPrice: product.retailPrice,
-      wholesalePrice: product.wholesalePrice,
-    });
+    setFormData(toFormData(product));
   };
 
-  // Update Product
-  const updateProduct = () => {
-    if (!formData.name.trim()) {
-      alert("Please enter a product name.");
+  const updateProduct = async () => {
+    setError("");
+    if (!editingProduct || !validateForm()) return;
+
+    setSaving(true);
+
+    const { error: updateError } = await supabase
+      .from("products")
+      .update(getDatabaseValues())
+      .eq("id", editingProduct.id);
+
+    setSaving(false);
+
+    if (updateError) {
+      setError(updateError.message);
       return;
     }
-
-    if (!formData.retailPrice || Number(formData.retailPrice) <= 0) {
-      alert("Retail price must be greater than 0.");
-      return;
-    }
-
-    if (!formData.wholesalePrice || Number(formData.wholesalePrice) <= 0) {
-      alert("Wholesale price must be greater than 0.");
-      return;
-    }
-
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === editingProduct.id
-          ? {
-              ...product,
-              name: formData.name,
-              unit: formData.unit,
-              retailPrice: Number(formData.retailPrice),
-              wholesalePrice: Number(formData.wholesalePrice),
-            }
-          : product
-      )
-    );
 
     setEditingProduct(null);
     setFormData(initialFormData);
+    await loadProducts();
   };
 
-  // Cancel Editing
+  const deleteProduct = async (id) => {
+    const confirmed = window.confirm(
+      "Remove this product from the active Rate Card? Existing order and inventory history will be preserved."
+    );
+
+    if (!confirmed) return;
+
+    setError("");
+
+    const { error: deleteError } = await supabase
+      .from("products")
+      .update({ is_active: false })
+      .eq("id", id);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
+    }
+
+    if (editingProduct?.id === id) {
+      setEditingProduct(null);
+      setFormData(initialFormData);
+    }
+
+    await loadProducts();
+  };
+
   const cancelEdit = () => {
     setEditingProduct(null);
     setFormData(initialFormData);
+    setError("");
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Rate Card</h1>
+    <div className="rate-card-page">
+      <header className="page-header rate-card-header">
+        <div>
+          <p className="page-eyebrow">PRODUCT MANAGEMENT</p>
+          <h1 className="page-title">Rate Card</h1>
+          <p className="page-description">
+            Manage products and their retail and wholesale prices.
+          </p>
+        </div>
+
+        <div className="rate-card-count">
+          <span className="rate-card-count-number">{products.length}</span>
+          <span>Active products</span>
+        </div>
+      </header>
+
+      {error && (
+        <div className="app-alert app-alert-error" role="alert">
+          <strong>Something needs your attention</strong>
+          <p>{error}</p>
+        </div>
+      )}
 
       <ProductForm
         formData={formData}
@@ -137,13 +228,38 @@ function RateCard() {
         updateProduct={updateProduct}
         editingProduct={editingProduct}
         cancelEdit={cancelEdit}
+        saving={saving}
       />
 
-      <ProductTable
-        products={products}
-        deleteProduct={deleteProduct}
-        editProduct={editProduct}
-      />
+      <section className="rate-card-list-section">
+        <div className="section-heading">
+          <div>
+            <h2>Product price list</h2>
+            <p>Each packet size has its own independently entered price.</p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="rate-card-state">
+            <span className="loading-spinner" />
+            <p>Loading products from your database...</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="rate-card-state rate-card-empty">
+            <div className="rate-card-empty-icon">₹</div>
+            <h3>No products added yet</h3>
+            <p>
+              Add your first product above. Your saved prices will appear here.
+            </p>
+          </div>
+        ) : (
+          <ProductTable
+            products={products}
+            deleteProduct={deleteProduct}
+            editProduct={editProduct}
+          />
+        )}
+      </section>
     </div>
   );
 }

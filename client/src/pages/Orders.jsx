@@ -2,6 +2,7 @@ import { useState } from "react";
 import OrderForm from "../components/orders/OrderForm";
 import OrdersList from "../components/orders/OrdersList";
 import sampleProducts from "../data/sampleProducts";
+import { recordCollection } from "../services/orderService";
 
 function Orders({
   orders,
@@ -9,6 +10,21 @@ function Orders({
   inventory,
   setInventory,
 }) {
+  async function handleRecordCollection(orderItemId, collectedPackets) {
+  try {
+    const result = await recordCollection(
+      orderItemId,
+      collectedPackets
+    );
+
+    console.log("Collection recorded:", result);
+
+    // We'll refresh the orders and inventory after connecting
+    // this handler to your collection UI.
+  } catch (error) {
+    alert(error.message || "Unable to record collection.");
+  }
+}
   const [editingOrder, setEditingOrder] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -498,6 +514,7 @@ function Orders({
         onEdit={handleEditOrder}
         onDelete={handleDeleteOrder}
         onStatusChange={handleStatusChange}
+        onRecordCollection={handleRecordCollection}
       />
     </div>
   );

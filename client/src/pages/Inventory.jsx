@@ -1,6 +1,14 @@
 import InventoryTable from "../components/inventory/InventoryTable";
 
 function Inventory({ inventory, setInventory }) {
+  // --------------------------------------------------
+  // STOCK STATUS
+  // --------------------------------------------------
+
+  // --------------------------------------------------
+  // INCREASE STOCK
+  // --------------------------------------------------
+
   const increaseStock = (id) => {
     setInventory((prev) =>
       prev.map((item) =>
@@ -13,6 +21,10 @@ function Inventory({ inventory, setInventory }) {
       )
     );
   };
+
+  // --------------------------------------------------
+  // DECREASE STOCK
+  // --------------------------------------------------
 
   const decreaseStock = (id) => {
     setInventory((prev) =>
@@ -27,6 +39,10 @@ function Inventory({ inventory, setInventory }) {
     );
   };
 
+  // --------------------------------------------------
+  // EDIT STOCK
+  // --------------------------------------------------
+
   const editStock = (item) => {
     const value = prompt(
       `Enter new stock for ${item.name}`,
@@ -37,7 +53,10 @@ function Inventory({ inventory, setInventory }) {
 
     const newStock = Number(value);
 
-    if (isNaN(newStock) || newStock < 0) return;
+    if (isNaN(newStock) || newStock < 0) {
+      alert("Please enter a valid stock quantity.");
+      return;
+    }
 
     setInventory((prev) =>
       prev.map((product) =>
@@ -56,13 +75,6 @@ function Inventory({ inventory, setInventory }) {
       <h1 className="text-3xl font-bold mb-6">
         Inventory
       </h1>
-
-      <InventoryTable
-        inventory={inventory}
-        increaseStock={increaseStock}
-        decreaseStock={decreaseStock}
-        editStock={editStock}
-      />
     </div>
   );
 }

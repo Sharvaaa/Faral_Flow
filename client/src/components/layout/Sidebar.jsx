@@ -1,3 +1,4 @@
+
 import {
   FaBoxOpen,
   FaClipboardList,
@@ -33,13 +34,19 @@ const menuItems = [
 
 function Sidebar() {
   return (
-    <div className="sidebar">
+    <aside className="sidebar">
       <div className="logo">
-        <FaBoxOpen size={28} />
-        <h2>Faral</h2>
+        <div className="logo-mark">
+          <FaBoxOpen />
+        </div>
+
+        <div className="logo-copy">
+          <h2>Faral Flow</h2>
+          <p>Management System</p>
+        </div>
       </div>
 
-      <div className="menu">
+      <nav className="menu" aria-label="Main navigation">
         {menuItems.map((item) => (
           <NavLink
             key={item.name}
@@ -52,8 +59,8 @@ function Sidebar() {
             <span>{item.name}</span>
           </NavLink>
         ))}
-      </div>
-    </div>
+      </nav>
+    </aside>
   );
 }
 

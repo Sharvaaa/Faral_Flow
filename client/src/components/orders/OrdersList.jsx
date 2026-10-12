@@ -1,3 +1,4 @@
+```jsx
 import OrderRow from "./OrderRow";
 
 function OrdersList({
@@ -5,6 +6,7 @@ function OrdersList({
   onEdit,
   onDelete,
   onStatusChange,
+  onRecordCollection,
 }) {
   if (!orders || orders.length === 0) {
     return (
@@ -27,6 +29,7 @@ function OrdersList({
           onEdit={onEdit}
           onDelete={onDelete}
           onStatusChange={onStatusChange}
+          onRecordCollection={onRecordCollection}
         />
       ))}
     </div>
@@ -34,3 +37,4 @@ function OrdersList({
 }
 
 export default OrdersList;
+```
