@@ -1,4 +1,3 @@
-```jsx
 import OrderRow from "./OrderRow";
 
 function OrdersList({
@@ -37,4 +36,3 @@ function OrdersList({
 }
 
 export default OrdersList;
-```
