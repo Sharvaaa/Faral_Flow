@@ -38,6 +38,7 @@ function RateCard() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [showProductForm, setShowProductForm] = useState(false);
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
@@ -49,7 +50,7 @@ function RateCard() {
         "id, name, retail_price_250g, retail_price_500g, retail_price_750g, retail_price_1kg, wholesale_price_per_kg, is_active"
       )
       .eq("is_active", true)
-      .order("name");
+      .order("name", { ascending: false });
 
     if (fetchError) {
       setError(fetchError.message);
@@ -132,6 +133,8 @@ function RateCard() {
     }
 
     setFormData(initialFormData);
+    setEditingProduct(null);
+    setShowProductForm(false);
     await loadProducts();
   };
 
@@ -139,6 +142,7 @@ function RateCard() {
     setError("");
     setEditingProduct(product);
     setFormData(toFormData(product));
+    setShowProductForm(true);
   };
 
   const updateProduct = async () => {
@@ -161,6 +165,7 @@ function RateCard() {
 
     setEditingProduct(null);
     setFormData(initialFormData);
+    setShowProductForm(false);
     await loadProducts();
   };
 
@@ -186,6 +191,7 @@ function RateCard() {
     if (editingProduct?.id === id) {
       setEditingProduct(null);
       setFormData(initialFormData);
+      setShowProductForm(false);
     }
 
     await loadProducts();
@@ -195,6 +201,14 @@ function RateCard() {
     setEditingProduct(null);
     setFormData(initialFormData);
     setError("");
+    setShowProductForm(false);
+  };
+
+  const openAddProduct = () => {
+    setError("");
+    setEditingProduct(null);
+    setFormData(initialFormData);
+    setShowProductForm(true);
   };
 
   return (
@@ -204,7 +218,7 @@ function RateCard() {
           <p className="page-eyebrow">PRODUCT MANAGEMENT</p>
           <h1 className="page-title">Rate Card</h1>
           <p className="page-description">
-            Manage products and their retail and wholesale prices.
+            View product prices and manage your rate card.
           </p>
         </div>
 
@@ -221,22 +235,20 @@ function RateCard() {
         </div>
       )}
 
-      <ProductForm
-        formData={formData}
-        setFormData={setFormData}
-        addProduct={addProduct}
-        updateProduct={updateProduct}
-        editingProduct={editingProduct}
-        cancelEdit={cancelEdit}
-        saving={saving}
-      />
-
       <section className="rate-card-list-section">
         <div className="section-heading">
           <div>
             <h2>Product price list</h2>
             <p>Each packet size has its own independently entered price.</p>
           </div>
+
+          <button
+            type="button"
+            className="add-product-toggle"
+            onClick={openAddProduct}
+          >
+            + Add Product
+          </button>
         </div>
 
         {loading ? (
@@ -249,7 +261,7 @@ function RateCard() {
             <div className="rate-card-empty-icon">₹</div>
             <h3>No products added yet</h3>
             <p>
-              Add your first product above. Your saved prices will appear here.
+              Use Add Product to add your first item to the Rate Card.
             </p>
           </div>
         ) : (
@@ -260,6 +272,31 @@ function RateCard() {
           />
         )}
       </section>
+
+      {showProductForm && (
+        <section className="rate-card-form-section">
+          <div className="section-heading">
+            <div>
+              <h2>{editingProduct ? "Edit Product" : "Add New Product"}</h2>
+              <p>
+                {editingProduct
+                  ? "Update the product details and prices."
+                  : "Enter the product details and prices below."}
+              </p>
+            </div>
+          </div>
+
+          <ProductForm
+            formData={formData}
+            setFormData={setFormData}
+            addProduct={addProduct}
+            updateProduct={updateProduct}
+            editingProduct={editingProduct}
+            cancelEdit={cancelEdit}
+            saving={saving}
+          />
+        </section>
+      )}
     </div>
   );
 }

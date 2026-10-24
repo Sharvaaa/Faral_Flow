@@ -1,10 +1,15 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaUserCircle,
+  FaSignOutAlt,
+  FaBars,
+  FaChevronLeft,
+} from "react-icons/fa";
 import { supabase } from "../../services/supabase";
 
-function Navbar() {
+function Navbar({ onMenuClick, sidebarCollapsed }) {
   const navigate = useNavigate();
   const [loggingOut, setLoggingOut] = useState(false);
   const [error, setError] = useState("");
@@ -16,9 +21,7 @@ function Navbar() {
     try {
       const { error: logoutError } = await supabase.auth.signOut();
 
-      if (logoutError) {
-        throw logoutError;
-      }
+      if (logoutError) throw logoutError;
 
       navigate("/login", { replace: true });
     } catch (err) {
@@ -29,30 +32,47 @@ function Navbar() {
   }
 
   return (
-    <div className="navbar">
-      <h2>Faral Management System</h2>
+    <header className="navbar">
+      <div className="navbar-heading">
+        <button
+          type="button"
+          className="navbar-menu-button"
+          onClick={onMenuClick}
+          aria-label="Toggle navigation"
+          title="Toggle navigation"
+        >
+          <FaBars />
+        </button>
+
+        <div className="navbar-title-wrap">
+          <h2>Faral Management System</h2>
+          <p>Manage orders, stock and customer pickups</p>
+        </div>
+      </div>
 
       <div className="profile">
-        <FaUserCircle size={32} />
-        <span>Admin</span>
+        <div className="profile-identity">
+          <FaUserCircle size={30} />
+          <span>Admin</span>
+        </div>
 
         <button
           type="button"
           onClick={handleLogout}
           disabled={loggingOut}
-          className="ml-4 flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm hover:bg-gray-100 disabled:opacity-60"
+          className="logout-button"
         >
           <FaSignOutAlt />
-          {loggingOut ? "Logging out..." : "Logout"}
+          <span>{loggingOut ? "Logging out..." : "Logout"}</span>
         </button>
       </div>
 
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="navbar-error">
           {error}
         </p>
       )}
-    </div>
+    </header>
   );
 }
 

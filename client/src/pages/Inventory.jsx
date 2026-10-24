@@ -1,80 +1,94 @@
+
+import { useEffect, useState } from "react";
 import InventoryTable from "../components/inventory/InventoryTable";
+import { getInventory } from "../services/inventoryService";
 
-function Inventory({ inventory, setInventory }) {
-  // --------------------------------------------------
-  // STOCK STATUS
-  // --------------------------------------------------
+function Inventory() {
+  const [inventory, setInventory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // --------------------------------------------------
-  // INCREASE STOCK
-  // --------------------------------------------------
+  useEffect(() => {
+    let isMounted = true;
 
-  const increaseStock = (id) => {
-    setInventory((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              stock: item.stock + 1,
-            }
-          : item
-      )
-    );
-  };
+    async function loadInventory() {
+      setLoading(true);
+      setError("");
 
-  // --------------------------------------------------
-  // DECREASE STOCK
-  // --------------------------------------------------
+      try {
+        const items = await getInventory();
 
-  const decreaseStock = (id) => {
-    setInventory((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              stock: Math.max(0, item.stock - 1),
-            }
-          : item
-      )
-    );
-  };
-
-  // --------------------------------------------------
-  // EDIT STOCK
-  // --------------------------------------------------
-
-  const editStock = (item) => {
-    const value = prompt(
-      `Enter new stock for ${item.name}`,
-      item.stock
-    );
-
-    if (value === null) return;
-
-    const newStock = Number(value);
-
-    if (isNaN(newStock) || newStock < 0) {
-      alert("Please enter a valid stock quantity.");
-      return;
+        if (isMounted) {
+          setInventory(items);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err.message || "Unable to load inventory.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
     }
 
-    setInventory((prev) =>
-      prev.map((product) =>
-        product.id === item.id
-          ? {
-              ...product,
-              stock: newStock,
-            }
-          : product
-      )
-    );
-  };
+    loadInventory();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">
-        Inventory
-      </h1>
+      <h1 className="text-3xl font-bold mb-2">Inventory</h1>
+      <p className="text-gray-600 mb-6">
+        View current stock levels for your products.
+      </p>
+
+      {loading && (
+        <p className="py-6">Loading inventory...</p>
+      )}
+
+      {!loading && error && (
+        <div className="rounded-lg bg-red-50 text-red-700 p-4">
+          <p className="font-semibold">Could not load inventory</p>
+          <p>{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && inventory.length === 0 && (
+        <div className="rounded-lg bg-white p-6 shadow">
+          No active inventory items were found.
+        </div>
+      )}
+
+      {!loading && !error && inventory.length > 0 && (
+        <>
+          <div className="mb-4 text-sm text-gray-600">
+            {inventory.length} products
+          </div>
+
+          <InventoryTable
+            inventory={inventory}
+            increaseStock={() => {
+              alert(
+                "Stock editing will be enabled after we safely connect it to Supabase."
+              );
+            }}
+            decreaseStock={() => {
+              alert(
+                "Stock editing will be enabled after we safely connect it to Supabase."
+              );
+            }}
+            editStock={() => {
+              alert(
+                "Stock editing will be enabled after we safely connect it to Supabase."
+              );
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }

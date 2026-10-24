@@ -1,20 +1,13 @@
 
 import { supabase } from "./supabase";
 
-export async function recordCollection(
-  orderItemId,
-  collectedPackets
-) {
-  const { data, error } = await supabase.rpc(
-    "record_partial_collection",
-    {
-      p_order_item_id: orderItemId,
-      p_collected_packet_count: Number(collectedPackets),
-    }
-  );
+export async function markOrderCollected(orderId) {
+  const { data, error } = await supabase.rpc("mark_order_collected", {
+    p_order_id: orderId,
+  });
 
   if (error) {
-    console.error("Collection failed:", error.message);
+    console.error("Failed to mark order collected:", error.message);
     throw error;
   }
 
