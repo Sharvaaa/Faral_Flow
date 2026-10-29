@@ -1,0 +1,21 @@
+/* Styles for the InventoryTable component.
+   Main table styling is in pages/Inventory.css. */
+
+.inventory-table-wrapper {
+    display: block;
+    max-width: 100%;
+}
+
+.inventory-table {
+    table-layout: fixed;
+}
+
+.inventory-table th:first-child,
+.inventory-table td:first-child {
+    width: 60%;
+}
+
+.inventory-table th:last-child,
+.inventory-table td:last-child {
+    width: 40%;
+}

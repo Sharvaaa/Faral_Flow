@@ -36,17 +36,12 @@ function Sidebar({
     >
       <div className="sidebar-top">
         <div className="logo">
-          <div className="logo-mark">
-            <FaBoxOpen />
-          </div>
-
-          {!collapsed && (
-            <div className="logo-copy">
-              <h2>Faral Flow</h2>
-              <p>Management System</p>
-            </div>
-          )}
-        </div>
+  <img
+    src="/faral_flow_logo_cropped.png"
+    alt="Faral Flow"
+    className="sidebar-logo-image"
+  />
+</div>
 
         <button
           type="button"

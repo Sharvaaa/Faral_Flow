@@ -1,5 +1,5 @@
 
-import "./InventoryTable.css";
+import "./inventoryTable.css";
 
 function InventoryTable({ inventory }) {
   return (
