@@ -1,35 +1,65 @@
-import InventoryRow from "./InventoryRow";
 
-function InventoryTable({
-  inventory,
-  increaseStock,
-  decreaseStock,
-  editStock,
-}) {
+import "./InventoryTable.css";
+
+function InventoryTable({ inventory }) {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="text-left px-5 py-3">Product</th>
-            <th className="text-left px-5 py-3">Stock</th>
-            <th className="text-left px-5 py-3">Status</th>
-            <th className="text-left px-5 py-3">Actions</th>
-          </tr>
-        </thead>
+    <div className="inventory-panel">
+      <div className="inventory-panel-header">
+        <div>
+          <h2 className="inventory-panel-title">
+            Product quantities
+          </h2>
+          <p className="inventory-panel-description">
+            Total quantity across current orders
+          </p>
+        </div>
 
-        <tbody>
-          {inventory.map((item) => (
-            <InventoryRow
-              key={item.id}
-              item={item}
-              increaseStock={increaseStock}
-              decreaseStock={decreaseStock}
-              editStock={editStock}
-            />
-          ))}
-        </tbody>
-      </table>
+        <span className="inventory-live-label">
+          <span className="inventory-live-dot" />
+          Live updates
+        </span>
+      </div>
+
+      <div className="inventory-table-wrapper">
+        <table className="inventory-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity ordered</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {inventory.map((item) => (
+              <tr key={item.id}>
+                <td>
+                  <div className="inventory-product-cell">
+                    <span className="inventory-product-icon">
+                      <span aria-hidden="true">✦</span>
+                    </span>
+
+                    <span>{item.name}</span>
+                  </div>
+                </td>
+
+                <td>
+                  <span className="inventory-quantity">
+                    {Number(
+                      item.quantity_ordered ?? 0
+                    ).toLocaleString("en-IN", {
+                      maximumFractionDigits: 3,
+                    })}
+
+                    <span className="inventory-quantity-unit">
+                      kg
+                    </span>
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
